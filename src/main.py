@@ -1,20 +1,14 @@
-from src.power import power_function
-from src.constants import SAMPLE_CONSTANT
+from dispatcher import TaskDispatcher
+from sources import FileSource, GeneratorSource, APISource
 
-
-def main() -> None:
-    """
-    Обязательнная составляющая программ, которые сдаются. Является точкой входа в приложение
-    :return: Данная функция ничего не возвращает
-    """
-
-    target, degree = map(int, input("Введите два числа разделенные пробелом: ").split(" "))
-
-    result = power_function(target=target, power=degree)
-
-    print(result)
-
-    print(SAMPLE_CONSTANT)
+def main():
+    sources = [
+        FileSource("src/data/data.json"),
+        GeneratorSource(5),
+        APISource()
+    ]
+    dispatcher = TaskDispatcher(sources)
+    dispatcher.process_all()
 
 if __name__ == "__main__":
     main()
