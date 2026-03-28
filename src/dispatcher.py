@@ -16,4 +16,4 @@ class TaskDispatcher:
             for task in tasks:
                 self._out_task(task)
     def _out_task(self, task: Task) -> None:
-        print(f"Processing task: {task.id} | Payload: {task.payload}")
+        print(f"Processing task: {task.id} | Payload: {task.payload} | Priority: {task.priority}" )
