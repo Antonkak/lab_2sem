@@ -1,26 +1,28 @@
 [
     {
-        "id": "file_task_1",
         "payload": {
             "source": "file",
             "type": "order",
             "data": "Process order #12345"
-        }
+        },
+    "priority": 2
     },
     {
-        "id": "file_task_2",
         "payload": {
             "source": "file",
             "type": "notification",
             "data": "Send email to user@example.com"
-        }
+        },
+    "priority": 5
+
     },
     {
-        "id": "file_task_3",
         "payload": {
             "source": "file",
             "type": "analytics",
             "data": "Recalculate statistics for 2024"
-        }
+        },
+    "priority": 3
+
     }
 ]
