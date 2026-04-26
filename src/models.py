@@ -33,7 +33,7 @@ class Task:
     payload: Any
     priority: int = 5
 
-    priority = PriorCheck(default=5)
+    priority = PriorCheck(default=5) # type: ignore[assignment]
 
     _id: str = field(default_factory=lambda: str(uuid.uuid4()), init=False)
     _created_at: datetime = field(default_factory=datetime.now, init=False)
