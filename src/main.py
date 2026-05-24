@@ -1,9 +1,11 @@
-from dispatcher import TaskDispatcher
-from sources import FileSource, GeneratorSource, APISource
-from queue import TaskQueue
+from src.dispatcher import TaskDispatcher
+from src.sources import FileSource, GeneratorSource, APISource
+from src.queue import TaskQueue
+import asyncio
+from src.executor import TaskExecutor
+from src.handler import Handler
 
-
-def main():
+async def main():
     sources = [
         FileSource("src/data/data.json"),
         GeneratorSource(5),
@@ -14,12 +16,15 @@ def main():
     queue = TaskQueue()
     for source in sources:
         queue.add_source(source)
-    print("Все задачи:")
-    for i, task in enumerate(queue, 1):
-        print(f"  {i}. [{task.id[:8]}] приоритет={task.priority}, статус={task._status}")
-    print("Задачи с приоритетом 2:")
-    for task in queue.filter_by_priority(2):
-        print(f"  - [{task.id[:8]}] приоритет={task.priority}, статус={task._status}")
 
+    await queue.load_tasks_to_queue()
+
+    handler = Handler()
+    async with TaskExecutor(queue, handler):
+        while len(queue) > 0:
+            await asyncio.sleep(0.1)
+    async with TaskExecutor(queue.filter_by_priority(4), handler):
+         while len(queue) > 0:
+            await asyncio.sleep(0.1)
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import Any
 import uuid
 from datetime import datetime
-from exeptions.task_exeption import TaskCheckError
+from src.exeptions.task_exeption import TaskCheckError
 
 class PriorCheck:
     def __init__(self, default=5):
