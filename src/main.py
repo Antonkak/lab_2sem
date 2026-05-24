@@ -1,6 +1,6 @@
-from dispatcher import TaskDispatcher
-from sources import FileSource, GeneratorSource, APISource
-from queue import TaskQueue
+from src.dispatcher import TaskDispatcher
+from src.sources import FileSource, GeneratorSource, APISource
+from src.queue import TaskQueue
 
 
 def main():

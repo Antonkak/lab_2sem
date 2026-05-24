@@ -1,5 +1,5 @@
-from protocols import TaskSource
-from models import Task
+from src.protocols import TaskSource
+from src.models import Task
 
 class TaskDispatcher:
     """Принимает источники проверяет и обрабатывает"""

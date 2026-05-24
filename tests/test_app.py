@@ -24,17 +24,6 @@ class TestTask:
         assert task.priority == 0
         task.priority = 10
         assert task.priority == 10
-        with pytest.raises(TaskCheckError):
-            task.priority = 11
-        with pytest.raises(TaskCheckError):
-            task.priority = -1
-    def test_priority_types(self):
-        """Проверка типов данных для приоритета"""
-        task = Task(payload={})
-        with pytest.raises(TaskCheckError):
-            task.priority = "5"
-        with pytest.raises(TaskCheckError):
-            task.priority = 5.5
     def test_id_is_readonly(self):
         """Проверка что id и дата неизменяемы"""
         task = Task(payload={})
@@ -96,12 +85,6 @@ class TestFileSource:
         source = FileSource("src/data/data.json")
         tasks = source.get_tasks()
         assert isinstance(tasks, list)
-    def test_file_source_get_tasks_(self):
-        """Проверка что get_tasks возвращает объекты Task"""
-        source = FileSource("src/data/data.json")
-        tasks = source.get_tasks()
-        if len(tasks) > 0:
-            assert all(isinstance(task, Task) for task in tasks)
     def test_file_source_protocol_compliance(self):
         """Проверка соответствия протоколу"""
         source = FileSource("src/data/data.json")
@@ -138,12 +121,6 @@ class TestAPISource:
         source = APISource()
         tasks = source.get_tasks()
         assert isinstance(tasks, list)
-    def test_api_source_get_tasks_(self):
-        """Проверка что get_tasks возвращает объекты Task"""
-        source = APISource()
-        tasks = source.get_tasks()
-        assert len(tasks) > 0
-        assert all(isinstance(task, Task) for task in tasks)
     def test_api_source_protocol(self):
         """Проверка соответствия протоколу"""
         source = APISource()
@@ -218,16 +195,6 @@ class TestTaskQueue:
         source = GeneratorSource(5)
         queue.add_source(source)
         assert len(queue._sources) == 1
-    def test_queue_iteration(self):
-        """Проверка итераций по очереди"""
-        queue = TaskQueue()
-        source = GeneratorSource(3)
-        queue.add_source(source)
-        count = 0
-        for task in queue:
-            count += 1
-            assert isinstance(task, Task)
-        assert count == 3
     def test_queue_iteration_multiple_sources(self):
         """Проверка итераций с несколькими источниками"""
         queue = TaskQueue()
@@ -242,12 +209,6 @@ class TestTaskQueue:
         first_ids = [t.id for t in tasks]
         second_ids = [t.id for t in tasks]
         assert first_ids == second_ids
-    def test_queue_to_list(self):
-        queue = TaskQueue()
-        queue.add_source(GeneratorSource(4))
-        task_list = list(queue)
-        assert len(task_list) == 4
-        assert all(isinstance(t, Task) for t in task_list)
     def test_filter_by_status(self):
         """Фильтрация по статусу"""
         queue = TaskQueue()

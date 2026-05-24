@@ -1,6 +1,6 @@
 from typing import Generator
-from models import Task
-from protocols import TaskSource
+from src.models import Task
+from src.protocols import TaskSource
 
 class TaskQueue:
     """Очередь задач"""
