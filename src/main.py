@@ -12,19 +12,20 @@ async def main():
         APISource()
     ]
     dispatcher = TaskDispatcher(sources)
-    dispatcher.process_all()
+    dispatcher.process_all()    
     queue = TaskQueue()
     for source in sources:
         queue.add_source(source)
 
     await queue.load_tasks_to_queue()
-
     handler = Handler()
     async with TaskExecutor(queue, handler):
         while len(queue) > 0:
             await asyncio.sleep(0.1)
-    async with TaskExecutor(queue.filter_by_priority(4), handler):
-         while len(queue) > 0:
+            
+    filtered_queue = queue.filter_by_priority(4)
+    async with TaskExecutor(filtered_queue, handler):
+        while len(filtered_queue) > 0:
             await asyncio.sleep(0.1)
 if __name__ == "__main__":
     asyncio.run(main())
