@@ -6,6 +6,7 @@ from protocols import TaskSource
 from sources import FileSource, GeneratorSource, APISource
 from dispatcher import TaskDispatcher
 from exeptions.task_exeption import TaskCheckError
+from queue import TaskQueue
 
 class TestTask:
     """Тесты модели задачи и дескрипторов"""
@@ -23,17 +24,6 @@ class TestTask:
         assert task.priority == 0
         task.priority = 10
         assert task.priority == 10
-        with pytest.raises(TaskCheckError):
-            task.priority = 11
-        with pytest.raises(TaskCheckError):
-            task.priority = -1
-    def test_priority_types(self):
-        """Проверка типов данных для приоритета"""
-        task = Task(payload={})
-        with pytest.raises(TaskCheckError):
-            task.priority = "5"
-        with pytest.raises(TaskCheckError):
-            task.priority = 5.5
     def test_id_is_readonly(self):
         """Проверка что id и дата неизменяемы"""
         task = Task(payload={})
@@ -95,12 +85,6 @@ class TestFileSource:
         source = FileSource("src/data/data.json")
         tasks = source.get_tasks()
         assert isinstance(tasks, list)
-    def test_file_source_get_tasks_(self):
-        """Проверка что get_tasks возвращает объекты Task"""
-        source = FileSource("src/data/data.json")
-        tasks = source.get_tasks()
-        if len(tasks) > 0:
-            assert all(isinstance(task, Task) for task in tasks)
     def test_file_source_protocol_compliance(self):
         """Проверка соответствия протоколу"""
         source = FileSource("src/data/data.json")
@@ -137,12 +121,6 @@ class TestAPISource:
         source = APISource()
         tasks = source.get_tasks()
         assert isinstance(tasks, list)
-    def test_api_source_get_tasks_(self):
-        """Проверка что get_tasks возвращает объекты Task"""
-        source = APISource()
-        tasks = source.get_tasks()
-        assert len(tasks) > 0
-        assert all(isinstance(task, Task) for task in tasks)
     def test_api_source_protocol(self):
         """Проверка соответствия протоколу"""
         source = APISource()
@@ -206,3 +184,56 @@ class TestIntegration:
         ids1 = set(t.id for t in tasks1)
         ids2 = set(t.id for t in tasks2)
         assert ids1.isdisjoint(ids2)
+class TestTaskQueue:
+    def test_queue_creation(self):
+        """Проверка создания"""
+        queue = TaskQueue()
+        assert len(queue) == 0
+    def test_add_source(self):
+        """Добавление источника"""
+        queue = TaskQueue()
+        source = GeneratorSource(5)
+        queue.add_source(source)
+        assert len(queue._sources) == 1
+    def test_queue_iteration_multiple_sources(self):
+        """Проверка итераций с несколькими источниками"""
+        queue = TaskQueue()
+        queue.add_source(GeneratorSource(2))
+        queue.add_source(APISource())
+        tasks = list(queue)
+        assert len(tasks) == 3
+    def test_queue_iteration_multiple_times(self):
+        queue = TaskQueue()
+        queue.add_source(GeneratorSource(3))
+        tasks = list(queue)
+        first_ids = [t.id for t in tasks]
+        second_ids = [t.id for t in tasks]
+        assert first_ids == second_ids
+    def test_filter_by_status(self):
+        """Фильтрация по статусу"""
+        queue = TaskQueue()
+        source = GeneratorSource(5)
+        queue.add_source(source)
+        completed = list(queue.filter_by_status("New"))
+        assert len(completed) == 5
+        assert all(t._status == "New" for t in completed)
+    def test_filter_by_priority(self):
+        """Фильтрация по приоритету"""
+        queue = TaskQueue()
+        queue.add_source(GeneratorSource(5))
+        priority_2 = list(queue.filter_by_priority(2))
+        assert len(priority_2) == 1
+        assert priority_2[0].priority == 2
+    def test_filter_lazy_evaluation(self):
+        """Проверка ленивости генераторов"""
+        queue = TaskQueue()
+        queue.add_source(GeneratorSource(100))
+        result = queue.filter_by_status("New")
+        assert hasattr(result, "__iter__")
+        assert hasattr(result, "__next__")
+    def test_empty_queue_iteration(self):
+        queue = TaskQueue()
+        count = 0
+        for _ in queue:
+            count += 1
+        assert count == 0

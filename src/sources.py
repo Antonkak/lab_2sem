@@ -1,5 +1,5 @@
 import json
-from models import Task
+from src.models import Task
 
 class FileSource:
     """Задачи из файла"""
