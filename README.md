@@ -49,8 +49,7 @@ python src/main.py
 pytest --cov=src -v
 ```
 ### Пример использования
-```
-python
+```python
 from src.dispatcher import TaskDispatcher
 from src.sources import FileSource, GeneratorSource, APISource
 from src.queue import TaskQueue
@@ -84,7 +83,7 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 ### Вывод
-```
+```bash
 Processing task: 8c556858-c586-4825-a028-acd8a154e9d6 | Payload: {'source': 'file', 'type': 'order', 'data': 'Process order #12345'} | Priority: 2
 Processing task: 83877017-94bc-4057-a47c-afcf8b6061d4 | Payload: {'source': 'file', 'type': 'notification', 'data': 'Send email to user@example.com'} | Priority: 5
 Processing task: 507383c0-a719-4894-8966-cc7b950a15fe | Payload: {'source': 'file', 'type': 'analytics', 'data': 'Recalculate statistics for 2024'} | Priority: 3
@@ -98,7 +97,7 @@ Processing task: 8cdcf5b9-def9-4f2d-9420-2cdbe24b2154 | Payload: {'source': 'api
 ```
 ## Тестирование
 Покрытие кода
-```
+```bash
 Name                             Stmts   Miss  Cover   Missing
 --------------------------------------------------------------
 src\__init__.py                      0      0   100%
